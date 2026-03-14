@@ -1,0 +1,15 @@
+{
+  "name": "world-route-explorer",
+  "version": "1.0.0",
+  "description": "Interactive world map with optimized routes through every country and geography games",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["geography", "tsp", "leaflet", "world-map", "games"],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

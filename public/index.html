@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explore optimized routes through every country on Earth. Play geography games, track your progress, and challenge friends.">
+<meta property="og:title" content="World Route Explorer">
+<meta property="og:description" content="Optimized routes through 195 countries. 10 geography games. Choose your starting capital.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="World Route Explorer">
+<meta name="twitter:description" content="Travel the world from your browser — optimized routes, geography games, and more.">
+<title>World Route Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;font-family:'Segoe UI',system-ui,sans-serif;color:#e0e0e0;overflow-x:hidden}
+#bgmap{position:fixed;inset:0;z-index:0;opacity:0.3;filter:brightness(0.4)}
+.content{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.hero{text-align:center;margin-bottom:48px;animation:fadeUp 0.8s ease}
+.hero h1{font-size:clamp(32px,6vw,52px);margin-bottom:12px;background:linear-gradient(135deg,#00ffcc,#4fc3f7,#b388ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.hero p{color:#99a;font-size:clamp(14px,2.5vw,18px);max-width:540px;margin:0 auto;line-height:1.6}
+.hero .sub{margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,204,0.08);color:#00ffcc;border:1px solid rgba(0,255,204,0.15);padding:6px 14px;border-radius:20px;font-size:12px;transition:all 0.3s;text-decoration:none;cursor:pointer}
+.chip:hover{background:rgba(0,255,204,0.15);transform:scale(1.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:960px;width:100%;animation:fadeUp 1s ease 0.2s both}
+.card{background:rgba(22,33,62,0.8);backdrop-filter:blur(12px);border-radius:16px;padding:28px;text-decoration:none;color:#e0e0e0;transition:all 0.3s;border:1px solid rgba(255,255,255,0.06);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c);opacity:0.8}
+.card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(0,0,0,0.4);border-color:color-mix(in srgb,var(--c) 30%,transparent)}
+.card .icon{font-size:36px;margin-bottom:12px;display:block}
+.card h2{font-size:17px;color:var(--c);margin-bottom:8px;font-weight:600}
+.card p{font-size:13px;color:#889;line-height:1.6}
+.card .tag{display:inline-block;margin-top:10px;font-size:11px;color:var(--c);opacity:0.7;border:1px solid color-mix(in srgb,var(--c) 20%,transparent);padding:2px 8px;border-radius:10px}
+.stats{margin-top:40px;text-align:center;font-size:14px;color:#556;display:flex;gap:32px;flex-wrap:wrap;justify-content:center;animation:fadeUp 1s ease 0.4s both}
+.stat-item{text-align:center}
+.stat-item .num{font-size:28px;font-weight:700;color:#00ffcc;display:block}
+.stat-item .label{font-size:11px;color:#667;text-transform:uppercase;letter-spacing:1px}
+footer{margin-top:40px;padding:20px;text-align:center;font-size:11px;color:#445;animation:fadeUp 1s ease 0.6s both}
+footer a{color:#00ffcc;text-decoration:none}
+#themeDropdown{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:rgba(16,22,44,0.97);backdrop-filter:blur(16px);border:1px solid rgba(0,255,204,0.15);border-radius:14px;padding:16px 20px;z-index:10;min-width:240px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+#themeDropdown.open{display:block;animation:fadeIn 0.2s}
+#themeDropdown .label{font-size:11px;color:#667;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:block}
+#themeDropdown .opts{display:flex;flex-direction:column;gap:6px}
+#themeDropdown .opts .btn{padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#aab;transition:all 0.2s;text-align:left;display:flex;align-items:center;gap:8px}
+#themeDropdown .opts .btn:hover{background:rgba(255,255,255,0.08);transform:translateX(2px)}
+#themeDropdown .opts .btn.active{background:rgba(0,255,204,0.12);color:#00ffcc;border-color:rgba(0,255,204,0.3)}
+#themeDropdown .opts .btn.active::before{content:'✓';font-size:11px}
+.chip-wrap{position:relative;display:inline-block}
+.country-picker-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s}
+.country-picker{background:#16213e;border-radius:16px;padding:24px;width:400px;max-width:calc(100vw - 32px);max-height:80vh;display:flex;flex-direction:column;border:1px solid rgba(0,255,204,0.15);box-shadow:0 16px 50px rgba(0,0,0,0.5)}
+.country-picker h2{color:#00ffcc;font-size:18px;margin-bottom:4px;text-align:center}
+.country-picker p{color:#889;font-size:12px;margin-bottom:14px;text-align:center}
+.cp-search{width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(0,255,204,0.15);background:rgba(255,255,255,0.05);color:#e0e0e0;font-size:13px;outline:none;margin-bottom:10px}
+.cp-search:focus{border-color:rgba(0,255,204,0.4)}
+.cp-search::placeholder{color:#556}
+.cp-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,255,204,0.2) transparent}
+.cp-list::-webkit-scrollbar{width:5px}
+.cp-list::-webkit-scrollbar-thumb{background:rgba(0,255,204,0.2);border-radius:3px}
+.cp-item{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center}
+.cp-item:hover{background:rgba(0,255,204,0.1)}
+.cp-item.active{background:rgba(0,255,204,0.15);color:#00ffcc}
+.cp-cap{font-size:11px;color:#667}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.leaflet-container{background:#0a0a1a!important}
+.leaflet-control-attribution,.leaflet-control-zoom{display:none!important}
+</style>
+</head>
+<body>
+<div id="bgmap"></div>
+<div class="content">
+  <div class="hero">
+    <h1>🌍 World Route Explorer</h1>
+    <p>Explore optimized routes through every country on Earth. Play geography games. Challenge your friends.</p>
+    <div class="sub">
+      <span class="chip" id="countryChip" style="cursor:pointer">📍 <span id="countryLabel">195 Countries</span> ▾</span>
+      <a href="games.html" class="chip">🎮 10 Game Modes</a>
+      <span class="chip-wrap">
+        <span class="chip" id="themeChip" style="cursor:pointer">🎨 5 Themes ▾</span>
+        <div id="themeDropdown"><span class="label">Choose Theme</span><div class="opts" id="themeOpts"></div></div>
+      </span>
+    </div>
+  </div>
+  <div class="grid">
+    <a class="card" href="capitals.html" style="--c:#00ffcc">
+      <span class="icon">🏛️</span>
+      <h2>Capital Cities Route</h2>
+      <p>Visit every world capital on an optimized path with great circle arcs, continent filters, and search.</p>
+      <span class="tag">195 stops</span>
+    </a>
+    <a class="card" href="centers.html" style="--c:#ff8c00">
+      <span class="icon">📍</span>
+      <h2>Country Centers</h2>
+      <p>Pass through the geographic heart of every country — the shortest "just passing through" route.</p>
+      <span class="tag">195 stops</span>
+    </a>
+    <a class="card" href="territories.html" style="--c:#b388ff">
+      <span class="icon">🗺️</span>
+      <h2>All Territories</h2>
+      <p>Every sovereign nation plus French Guiana, Guam, Greenland, and 49 more overseas territories.</p>
+      <span class="tag">247 stops</span>
+    </a>
+    <a class="card" href="games.html" style="--c:#00ff88">
+      <span class="icon">🎮</span>
+      <h2>Geography Games</h2>
+      <p>Quiz, Speed Click, Pin Drop, Scramble, Higher or Lower, Continent Sort, and more.</p>
+      <span class="tag">10 modes</span>
+    </a>
+  </div>
+  <div class="stats">
+    <div class="stat-item"><span class="num">195</span><span class="label">Countries</span></div>
+    <div class="stat-item"><span class="num">247</span><span class="label">Territories</span></div>
+    <div class="stat-item"><span class="num">10</span><span class="label">Games</span></div>
+    <div class="stat-item"><span class="num">5</span><span class="label">Themes</span></div>
+  </div>
+  <footer>Built with Leaflet.js & OpenStreetMap</footer>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import { renderThemePicker } from './js/theme.js';
+import { CAPITALS, F, flag, getStartCapital, setStartCapital } from './js/data.js';
+
+// Theme picker
+document.getElementById('themeOpts').appendChild(renderThemePicker());
+document.getElementById('themeChip').addEventListener('click', () => {
+  document.getElementById('themeDropdown').classList.toggle('open');
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.chip-wrap')) document.getElementById('themeDropdown').classList.remove('open');
+});
+
+// Country picker
+function updateCountryLabel() {
+  const cur = getStartCapital();
+  const c = CAPITALS.find(c => c[F.CAPITAL] === cur);
+  document.getElementById('countryLabel').textContent = c ? `${flag(c[F.ISO])} ${c[F.NAME]}` : '195 Countries';
+}
+updateCountryLabel();
+
+document.getElementById('countryChip').addEventListener('click', () => {
+  const overlay = document.createElement('div');
+  overlay.className = 'country-picker-overlay';
+  const cur = getStartCapital();
+  const opts = CAPITALS.map(c =>
+    `<div class="cp-item${c[F.CAPITAL] === cur ? ' active' : ''}" data-cap="${c[F.CAPITAL]}">${flag(c[F.ISO])} ${c[F.NAME]} <span class="cp-cap">${c[F.CAPITAL]}</span></div>`
+  ).join('');
+  overlay.innerHTML = `<div class="country-picker">
+    <h2>📍 Choose Your Starting Country</h2>
+    <p>The route will begin from this country's capital</p>
+    <input type="text" class="cp-search" id="cpSearch" placeholder="🔍 Search countries..." autocomplete="off">
+    <div class="cp-list">${opts}</div>
+  </div>`;
+  document.body.appendChild(overlay);
+
+  const search = overlay.querySelector('#cpSearch');
+  const list = overlay.querySelector('.cp-list');
+
+  search.focus();
+  search.addEventListener('input', () => {
+    const s = search.value.toLowerCase();
+    list.querySelectorAll('.cp-item').forEach(el => {
+      el.style.display = el.textContent.toLowerCase().includes(s) ? '' : 'none';
+    });
+  });
+
+  list.addEventListener('click', e => {
+    const item = e.target.closest('.cp-item');
+    if (item) {
+      setStartCapital(item.dataset.cap);
+      updateCountryLabel();
+      overlay.remove();
+    }
+  });
+
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+});
+</script>
+<script>
+// Animated background map
+const map = L.map('bgmap', { zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false, keyboard: false, center: [30, 0], zoom: 2 });
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+let lng = 0;
+setInterval(() => { lng += 0.15; map.setView([30, lng], 2, { animate: false }); }, 50);
+</script>
+</body>
+</html>

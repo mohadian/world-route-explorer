@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geography Games — World Route Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="css/style.css?v=1773495728"/>
+<style>
+#hud {
+  position: absolute; top: 16px; left: 16px; z-index: 1000;
+  background: var(--card); padding: 20px 24px; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  backdrop-filter: blur(12px); width: 380px; max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: thin;
+}
+#hud::-webkit-scrollbar { width: 4px; }
+#hud::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 20%, transparent); border-radius: 2px; }
+#hud h1 { font-size: 20px; color: var(--accent); margin-bottom: 12px; }
+#gameSelect { margin: 10px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+#gameSelect .btn { font-size: 12px; padding: 6px 12px; }
+#gameArea { margin-top: 14px; }
+#gameArea .prompt { font-size: 14px; color: var(--text); margin: 8px 0; line-height: 1.5; }
+#feedback { font-size: 13px; margin: 8px 0; min-height: 20px; }
+#answerBtns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.ritem {
+  font-size: 12px; padding: 6px 10px; border-radius: 6px; cursor: grab;
+  background: rgba(255,255,255,0.04); margin: 3px 0;
+  display: flex; justify-content: space-between; align-items: center; user-select: none;
+}
+.ritem:hover { background: rgba(255,255,255,0.08); }
+.ritem.dragging { opacity: 0.4; }
+#routeList { max-height: 220px; overflow-y: auto; margin-top: 8px; scrollbar-width: thin; }
+.lb { margin-top: 10px; font-size: 11px; color: var(--muted); }
+.lb .entry { padding: 3px 0; display: flex; justify-content: space-between; }
+.lb .entry span:first-child { color: var(--accent); }
+.nav-home { text-align: center; }
+.nav-home a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.nav-home a:hover { color: var(--accent); }
+@media (max-width: 480px) {
+  #hud { width: calc(100vw - 16px); left: 8px; top: 8px; padding: 14px 16px; }
+  #hud h1 { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+<div id="hud">
+  <h1>🎮 Geography Games</h1>
+  <div id="currentGame" style="font-size:14px;color:var(--accent);margin-bottom:10px;font-weight:600"></div>
+  <div id="gameArea"></div>
+  <div id="moreGames" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+    <div id="moreGamesToggle" style="cursor:pointer;font-size:14px;color:var(--muted);display:flex;justify-content:space-between;align-items:center">
+      <span>More Games</span><span id="moreArrow">▸</span>
+    </div>
+    <div id="gameSelect" style="display:none;margin-top:8px"></div>
+  </div>
+  <div class="nav-home" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)"><a href="/">← Back to Home</a></div>
+</div>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="js/games.js?v=1773496412"></script>
+</body>
+</html>
