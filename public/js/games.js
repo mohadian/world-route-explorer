@@ -116,7 +116,7 @@ games.speed = () => {
   let cur = 0, start = null, timer = null, hard = false;
 
   // Ready screen with difficulty choice
-  map.setView([20, 0], 2);
+  map.setView([20, 0], 4);
   resetMarkers();
   ga.innerHTML = `<div class="prompt" style="text-align:center;margin:16px 0"><b>Speed Click</b><br>Find 20 countries as fast as you can!</div><div style="text-align:center;display:flex;gap:8px;justify-content:center"><button class="btn" id="sEasy" style="font-size:14px;padding:10px 20px">🟢 Easy</button><button class="btn" id="sHard" style="font-size:14px;padding:10px 20px">🔴 Hard</button></div><div class="note" style="text-align:center;margin-top:8px">Easy: country highlighted · Hard: find it yourself</div>`;
   document.getElementById('sEasy').onclick = () => beginGame(false);
@@ -125,7 +125,7 @@ games.speed = () => {
   function beginGame(isHard) {
     hard = isHard;
     start = Date.now();
-    map.setView([20, 0], 2);
+    map.setView([20, 0], 4);
     resetMarkers();
     ga.innerHTML = `<div class="prompt">Click <b>20 countries</b> — ${hard ? '🔴 Hard' : '🟢 Easy'}</div><div class="timer-big" id="sTimer">0.0s</div><div class="note">Find: <span id="sTarget"></span></div><div style="margin-top:8px"><button class="btn" id="sSkip">Skip →</button> <button class="btn danger" id="sReset">↺ Reset</button></div>`;
     timer = setInterval(() => { const el = document.getElementById('sTimer'); if (el) el.textContent = ((Date.now() - start) / 1000).toFixed(1) + 's'; }, 100);
