@@ -85,8 +85,8 @@ When changing `route-page.js`:
 - [ ] Update cache-bust `?v=` in capitals.html, centers.html, territories.html
 
 When changing `data.js`:
-- [ ] Update cache-bust `?v=` on `data.js` import inside route-page.js AND games.js
-- [ ] Then also cache-bust route-page.js and games.js in their HTML files (nested imports are cached separately)
+- [ ] Update cache-bust `?v=` on route-page.js and games.js in their HTML files
+- [ ] **NEVER** add `?v=` to JS-to-JS imports (e.g. `from './data.js?v=...'`) — this breaks ES module resolution on Vercel/CDNs. Only HTML `<script src>` and HTML `import from` can have query strings.
 
 When changing `games.js`:
 - [ ] Update cache-bust `?v=` in games.html

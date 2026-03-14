@@ -1,4 +1,4 @@
-import { CAPITALS as C, F, flag, havIdx, totalDist, shuffle, getStartIdx } from './data.js?v=1773500951';
+import { CAPITALS as C, F, flag, havIdx, totalDist, shuffle, getStartIdx } from './data.js';
 import { applyTheme, getTheme, currentThemeObj } from './theme.js';
 import { shareScore, renderShareBtn, recordPlay, renderStreak } from './social.js';
 import { INFO } from './country-info.js';
