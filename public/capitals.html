@@ -6,32 +6,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Capital Cities Route — World Route Explorer</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="css/style.css?v=1773495728"/>
+<link rel="stylesheet" href="css/style.css?v=1773504808"/>
 <style>body{display:flex}</style>
 </head>
 <body>
 <div id="loading"><h2>Optimizing Route...</h2><p>Running 2-opt on 195 capitals</p></div>
-<div class="panel" class="panel-tl">
-  <h1>🏛️ Capital Cities Route</h1>
-  <div class="stat">Countries: <span id="countStat">—</span></div>
-  <div class="stat">Distance: <span id="distStat">—</span></div>
-  <div class="progress-wrap">
-    <span class="progress-text">Visited: <span id="visitedCount">0</span>/<span id="totalCount">195</span></span>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="panel panel-tl">
+  <div class="panel-core">
+    <h1>🏛️ Capital Cities Route</h1>
+    <div class="stat">Distance: <span id="distStat">—</span></div>
+    <div class="progress-wrap">
+      <span class="progress-text">Visited: <span id="visitedCount">0</span>/<span id="totalCount">195</span></span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="controls-row">
+      <button class="btn" id="playBtn">▶ Play</button>
+      <button class="btn danger" id="resetBtn">↺ Reset</button>
+      <button class="btn" id="settingsBtn">⚙</button>
+      <button class="btn" id="panelToggle">⋯</button>
+    </div>
   </div>
-  <div class="controls-row">
-    <button class="btn" id="playBtn">▶ Play</button>
-    <button class="btn danger" id="resetBtn">↺ Reset</button>
-    <button class="btn" id="settingsBtn">⚙</button>
+  <div class="panel-extras">
+    <div class="stat">Countries: <span id="countStat">—</span></div>
+    <div class="speed-row">
+      <label>Speed:</label>
+      <input type="range" id="speedSlider" min="1" max="10" value="2">
+      <span id="speedLabel">2x</span>
+    </div>
+    <div class="nav-row"><a href="centers.html">Centers</a><a href="territories.html">Territories</a><a href="games.html">Games</a></div>
+    <div class="nav-home"><a href="/">← Back to Home</a></div>
   </div>
-  <div class="speed-row">
-    <label>Speed:</label>
-    <input type="range" id="speedSlider" min="1" max="10" value="2">
-    <span id="speedLabel">2x</span>
-  </div>
-  
-  <div class="nav-row"><a href="centers.html">Centers</a><a href="territories.html">Territories</a><a href="games.html">Games</a></div>
-  <div class="nav-home"><a href="/">← Back to Home</a></div>
 </div>
 <div id="map" ></div>
 <div id="sidebar">
@@ -45,7 +49,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 import { CAPITALS, F, flag } from './js/data.js';
-import { initRoutePage } from './js/route-page.js?v=1773503562';
+import { initRoutePage } from './js/route-page.js?v=1773504808';
 const data = CAPITALS.map(c => [c[F.NAME], c[F.CAPITAL], c[F.LAT], c[F.LNG], c[F.ISO]]);
 initRoutePage(data, 'visitedCapitals', c => ({ name: c[0], sub: c[1], flag: flag(c[4]) }));
 </script>

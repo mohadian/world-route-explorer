@@ -123,6 +123,16 @@ export function initRoutePage(data, storageKey, labelFn) {
   document.getElementById('playBtn').addEventListener('click', togglePlay);
   document.getElementById('resetBtn').addEventListener('click', resetVisited);
   document.getElementById('sidebarToggle').addEventListener('click', toggleSidebar);
+
+  // Panel expand/collapse toggle
+  const panelToggle = document.getElementById('panelToggle');
+  if (panelToggle) {
+    panelToggle.addEventListener('click', () => {
+      const panel = panelToggle.closest('.panel');
+      panel.classList.toggle('expanded');
+      panelToggle.textContent = panel.classList.contains('expanded') ? '✕' : '⋯';
+    });
+  }
   document.getElementById('speedSlider').addEventListener('input', e => document.getElementById('speedLabel').textContent = e.target.value + 'x');
   document.getElementById('searchBox').addEventListener('input', e => { searchTerm = e.target.value; renderList(); });
 
@@ -166,7 +176,7 @@ export function initRoutePage(data, storageKey, labelFn) {
       );
     }
     updateUI();
-    if (!document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
+    if (window.innerWidth > 768 && !document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
   }
 
   // Settings button to change start capital

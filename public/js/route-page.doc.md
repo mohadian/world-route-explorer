@@ -26,6 +26,11 @@
  * 
  * Required HTML element IDs:
  *   loading, countStat, distStat, visitedCount, totalCount, progressFill,
- *   playBtn, resetBtn, settingsBtn, speedSlider, speedLabel, searchBox,
- *   countryList, sidebar, sidebarToggle, map, themePicker
+ *   playBtn, resetBtn, settingsBtn, panelToggle, speedSlider, speedLabel, searchBox,
+ *   countryList, sidebar, sidebarToggle, map
+ * 
+ * Mobile behavior:
+ *   - Panel shows only core (title, distance, progress, buttons) by default
+ *   - ⋯ button expands to show speed, nav, country count
+ *   - Sidebar starts closed on mobile (< 768px)
  */

@@ -211,3 +211,23 @@ body { background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; co
 
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+/* Panel expand/collapse */
+.panel-extras { display: block; }
+.panel .panel-core #panelToggle { display: none; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .panel { max-width: calc(100vw - 60px); padding: 12px 14px; }
+  .panel h1 { font-size: 15px; margin-bottom: 4px; }
+  .panel .stat { font-size: 12px; margin: 2px 0; }
+  .panel .panel-extras { display: none; }
+  .panel.expanded .panel-extras { display: block; }
+  .panel .panel-core #panelToggle { display: inline-block; }
+  .panel .nav-row a { font-size: 12px; padding: 6px 10px; }
+  .controls-row { gap: 4px; }
+  .btn { padding: 6px 12px; font-size: 12px; }
+  #sidebar { width: 0; }
+  #sidebar.open { width: 220px; }
+  #sidebarInner { width: 220px; }
+}
