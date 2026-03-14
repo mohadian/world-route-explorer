@@ -147,10 +147,9 @@ games.speed = () => {
       document.getElementById('sAgain').onclick = () => games.speed(); return;
     }
     const idx = targets[cur];
-    // Easy: zoom to continent level and highlight; Hard: stay zoomed out, no highlight
+    // Easy: highlight only, no zoom — user must pan to find it; Hard: no highlight at all
     if (!hard) {
       highlightMarker(idx, currentThemeObj().accent, 8);
-      map.flyTo([C[idx][F.LAT], C[idx][F.LNG]], 4, { duration: 0.3 });
     }
     document.getElementById('sTarget').innerHTML = `${flag(C[idx][F.ISO])} ${C[idx][F.NAME]} (${cur + 1}/20)`;
   }

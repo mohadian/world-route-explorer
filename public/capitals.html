@@ -49,7 +49,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
 import { CAPITALS, F, flag } from './js/data.js';
-import { initRoutePage } from './js/route-page.js?v=1773504808';
+import { initRoutePage } from './js/route-page.js?v=1773505208';
 const data = CAPITALS.map(c => [c[F.NAME], c[F.CAPITAL], c[F.LAT], c[F.LNG], c[F.ISO]]);
 initRoutePage(data, 'visitedCapitals', c => ({ name: c[0], sub: c[1], flag: flag(c[4]) }));
 </script>

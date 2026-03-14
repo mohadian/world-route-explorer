@@ -59,7 +59,7 @@ function showStartPicker(onDone) {
 export function initRoutePage(data, storageKey, labelFn) {
   applyTheme(getTheme());
 
-  const visited = new Set(safeGet(storageKey, []));
+  const visited = new Set();
   let markers = [], route = [], map, animTimer = null, animIdx = 0, playing = false, searchTerm = '';
 
   function save() { safeSet(storageKey, [...visited]); }
