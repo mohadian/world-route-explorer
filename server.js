@@ -9,6 +9,12 @@ app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0
 }));
 
-app.listen(PORT, () => {
-  console.log(`🌍 World Route Explorer running at http://localhost:${PORT}`);
-});
+// For local dev
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🌍 World Route Explorer running at http://localhost:${PORT}`);
+  });
+}
+
+// For Vercel
+module.exports = app;
