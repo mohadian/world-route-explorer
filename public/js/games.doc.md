@@ -3,7 +3,7 @@
  * 
  * 7 game modes registered in GAMES array and games object:
  *   quiz     — Capital/flag identification, 15 rounds, 4 choices
- *   speed    — Click 20 random countries on map, timed
+ *   speed    — Click 20 random countries on map, timed. Easy (highlight + zoom to continent) / Hard (no hints). Skip button available.
  *   optimize — Drag-reorder 20 cities, compare to AI 2-opt solution
  *   pindrop  — Click map where country is, scored by km error
  *   distance — Guess km between two capitals, scored 0-100 per round
@@ -11,7 +11,7 @@
  *   closest  — Pick nearest capital from 4 choices, 12 rounds
  *   scramble — Unscramble anagrammed capital names, 12 rounds, hint shows flag+country
  *   hilo     — Higher or Lower population, streak-based scoring
- *   sort     — Sort 20 random countries into correct continent buckets, timed
+ *   sort     — Sort 20 random countries into correct continent buckets. Ready screen, reveal on answer, reset button.
  * 
  * Shared helpers:
  *   resetMarkers() — reset all markers to theme default

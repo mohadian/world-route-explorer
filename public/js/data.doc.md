@@ -16,8 +16,10 @@
  * TSP Solver:
  * - buildDistMatrix() → Float64Array distance matrix for CAPITALS
  * - nearestNeighbor(startIdx, dist) → greedy route from start
- * - twoOpt(route, dist, maxIter=80) → improved route via 2-opt swaps
+ * - twoOpt(route, dist, maxIter=80, matrixN=0) → improved route via 2-opt swaps
+ *     matrixN: dimension of the distance matrix (required when matrix is larger than route)
  * - solveGeneric(data, startIdx) → {route, dist, totalD} for any [name,label,lat,lng,...] array
+ *     Scales iterations: 300 for 200+ nodes, 100 otherwise
  * 
  * Start Capital Config:
  * - getStartCapital() → stored capital name (default: 'London')

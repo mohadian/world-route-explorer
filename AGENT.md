@@ -4,6 +4,7 @@
 Interactive web app showing optimized TSP routes through world countries with geography games. Node.js/Express serving static files. No build step. Vanilla JS ES Modules.
 
 ## Critical Rules
+- **ALWAYS update documentation** when making any code change. Update the relevant `.doc.md` file AND `AGENT.md` if architecture/patterns change. This is non-negotiable.
 - **NEVER remove cache-bust query strings** (`?v=`) from HTML imports without replacing them with new ones. Browser caching WILL serve stale files.
 - **NEVER rewrite entire files** when making small changes. Use targeted `str_replace` to avoid reverting other improvements.
 - **Always hard-test** after CSS/JS changes by checking the actual served content, not just the file on disk.
@@ -82,6 +83,10 @@ When changing shared CSS (`style.css`):
 
 When changing `route-page.js`:
 - [ ] Update cache-bust `?v=` in capitals.html, centers.html, territories.html
+
+When changing `data.js`:
+- [ ] Update cache-bust `?v=` on `data.js` import inside route-page.js AND games.js
+- [ ] Then also cache-bust route-page.js and games.js in their HTML files (nested imports are cached separately)
 
 When changing `games.js`:
 - [ ] Update cache-bust `?v=` in games.html

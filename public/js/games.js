@@ -1,4 +1,4 @@
-import { CAPITALS as C, F, flag, havIdx, totalDist, shuffle, getStartIdx } from './data.js';
+import { CAPITALS as C, F, flag, havIdx, totalDist, shuffle, getStartIdx } from './data.js?v=1773500951';
 import { applyTheme, getTheme, currentThemeObj } from './theme.js';
 import { shareScore, renderShareBtn, recordPlay, renderStreak } from './social.js';
 import { INFO } from './country-info.js';
@@ -113,23 +113,47 @@ games.quiz = () => {
 // ===== SPEED CLICK =====
 games.speed = () => {
   const targets = shuffle(Array.from({ length: C.length }, (_, i) => i)).slice(0, 20);
-  let cur = 0, start = Date.now(), timer;
+  let cur = 0, start = null, timer = null, hard = false;
+
+  // Ready screen with difficulty choice
+  map.setView([20, 0], 2);
+  resetMarkers();
+  ga.innerHTML = `<div class="prompt" style="text-align:center;margin:16px 0"><b>Speed Click</b><br>Find 20 countries as fast as you can!</div><div style="text-align:center;display:flex;gap:8px;justify-content:center"><button class="btn" id="sEasy" style="font-size:14px;padding:10px 20px">🟢 Easy</button><button class="btn" id="sHard" style="font-size:14px;padding:10px 20px">🔴 Hard</button></div><div class="note" style="text-align:center;margin-top:8px">Easy: country highlighted · Hard: find it yourself</div>`;
+  document.getElementById('sEasy').onclick = () => beginGame(false);
+  document.getElementById('sHard').onclick = () => beginGame(true);
+
+  function beginGame(isHard) {
+    hard = isHard;
+    start = Date.now();
+    map.setView([20, 0], 2);
+    resetMarkers();
+    ga.innerHTML = `<div class="prompt">Click <b>20 countries</b> — ${hard ? '🔴 Hard' : '🟢 Easy'}</div><div class="timer-big" id="sTimer">0.0s</div><div class="note">Find: <span id="sTarget"></span></div><div style="margin-top:8px"><button class="btn" id="sSkip">Skip →</button> <button class="btn danger" id="sReset">↺ Reset</button></div>`;
+    timer = setInterval(() => { const el = document.getElementById('sTimer'); if (el) el.textContent = ((Date.now() - start) / 1000).toFixed(1) + 's'; }, 100);
+    document.getElementById('sReset').onclick = () => { clearInterval(timer); mks.forEach(m => m.off('click')); games.speed(); };
+    document.getElementById('sSkip').onclick = () => { cur++; showTarget(); };
+    mks.forEach((m, i) => m.on('click', () => {
+      if (i === targets[cur]) { highlightMarker(i, currentThemeObj().visited, 5); cur++; showTarget(); }
+    }));
+    showTarget();
+  }
+
   function showTarget() {
     if (cur >= targets.length) {
       clearInterval(timer); const t = ((Date.now() - start) / 1000).toFixed(1);
+      const label = hard ? 'Speed Click (Hard)' : 'Speed Click';
       addScore('speed', parseFloat(t));
-      ga.innerHTML = `<div class="score-big">${t}s</div><p class="note">20 countries found!</p>${renderStreak()}${renderLB('speed', 's', 'asc')}${renderShareBtn('Speed Click', t, 's')} <button class="btn" id="sAgain">Play Again</button>`;
+      mks.forEach(m => m.off('click'));
+      ga.innerHTML = `<div class="score-big">${t}s</div><p class="note">20 countries found! ${hard ? '🔴 Hard' : '🟢 Easy'}</p>${renderStreak()}${renderLB('speed', 's', 'asc')}${renderShareBtn(label, t, 's')} <button class="btn" id="sAgain">Play Again</button>`;
       document.getElementById('sAgain').onclick = () => games.speed(); return;
     }
-    const idx = targets[cur]; highlightMarker(idx, currentThemeObj().accent, 8);
+    const idx = targets[cur];
+    // Easy: zoom to continent level and highlight; Hard: stay zoomed out, no highlight
+    if (!hard) {
+      highlightMarker(idx, currentThemeObj().accent, 8);
+      map.flyTo([C[idx][F.LAT], C[idx][F.LNG]], 4, { duration: 0.3 });
+    }
     document.getElementById('sTarget').innerHTML = `${flag(C[idx][F.ISO])} ${C[idx][F.NAME]} (${cur + 1}/20)`;
   }
-  ga.innerHTML = `<div class="prompt">Click <b>20 countries</b> as fast as you can!</div><div class="timer-big" id="sTimer">0.0s</div><div class="note">Find: <span id="sTarget"></span></div>`;
-  timer = setInterval(() => { document.getElementById('sTimer').textContent = ((Date.now() - start) / 1000).toFixed(1) + 's'; }, 100);
-  mks.forEach((m, i) => m.on('click', () => {
-    if (i === targets[cur]) { highlightMarker(i, currentThemeObj().visited, 5); cur++; showTarget(); }
-  }));
-  showTarget();
 };
 
 // ===== OPTIMIZE =====
@@ -308,7 +332,7 @@ games.scramble = () => {
 
 // ===== HIGHER OR LOWER =====
 games.hilo = () => {
-  function parsePop(s) { if (!s) return 0; const n = parseFloat(s); if (s.includes('B')) return n * 1000; return n; }
+  function parsePop(s) { if (!s) return 0; const n = parseFloat(s); if (s.includes('B')) return n * 1000000; if (s.includes('M')) return n * 1000; if (s.includes('K')) return n; return n; }
   let streak = 0, best = 0, curIdx = Math.floor(Math.random() * C.length);
   function show() {
     const info = INFO[C[curIdx][F.ISO]];
@@ -338,19 +362,36 @@ games.hilo = () => {
 games.sort = () => {
   const buckets = ['Europe', 'Asia', 'Africa', 'NAmerica', 'SAmerica', 'Oceania'];
   const items = shuffle(Array.from({ length: C.length }, (_, i) => i)).slice(0, 20);
-  let cur = 0, correct = 0, start = Date.now(), timer;
+  let cur = 0, correct = 0, start = null, timer = null;
+
+  // Zoom out to hide location, show "Ready?" screen
+  map.setView([20, 0], 2);
+  resetMarkers();
+  ga.innerHTML = `<div class="prompt" style="text-align:center;margin:16px 0"><b>Continent Sort</b><br>20 countries — pick the right continent!</div><div style="text-align:center"><button class="btn" id="csStart" style="font-size:15px;padding:10px 24px">Ready? Start →</button></div>`;
+  document.getElementById('csStart').onclick = beginGame;
+
+  function beginGame() {
+    start = Date.now();
+    ga.innerHTML = `<div class="note"><span id="csProg">1/${items.length}</span> · <span class="timer-big" id="csTimer">0.0s</span></div><div class="prompt">Which continent? <span id="csCountry"></span></div><div id="csBuckets" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${buckets.map(b => `<button class="btn cs-bucket" data-c="${b}">${b === 'NAmerica' ? 'N.America' : b === 'SAmerica' ? 'S.America' : b}</button>`).join('')}</div><div id="feedback" style="margin-top:8px"></div><div style="margin-top:8px"><button class="btn danger" id="csReset">↺ Reset</button></div>`;
+    timer = setInterval(() => { const el = document.getElementById('csTimer'); if (el) el.textContent = ((Date.now() - start) / 1000).toFixed(1) + 's'; }, 100);
+    document.getElementById('csReset').onclick = () => { clearInterval(timer); games.sort(); };
+    showItem();
+  }
+
   function showItem() {
     if (cur >= items.length) {
       clearInterval(timer);
       const t = ((Date.now() - start) / 1000).toFixed(1);
       addScore('sort', correct);
+      map.setView([20, 0], 2);
       ga.innerHTML = `<div class="score-big">${correct}/${items.length}</div><p class="note">${Math.round(correct / items.length * 100)}% correct in ${t}s</p>${renderStreak()}${renderLB('sort')}${renderShareBtn('Continent Sort', `${correct}/${items.length}`, '')} <button class="btn" id="csAgain">Play Again</button>`;
       document.getElementById('csAgain').onclick = () => games.sort();
       return;
     }
     const idx = items[cur];
-    resetMarkers(); highlightMarker(idx, currentThemeObj().accent, 8);
-    map.flyTo([C[idx][F.LAT], C[idx][F.LNG]], 3, { duration: 0.3 });
+    // Zoom out — don't reveal location
+    map.setView([20, 0], 2);
+    resetMarkers();
     document.getElementById('csTimer').textContent = ((Date.now() - start) / 1000).toFixed(1) + 's';
     document.getElementById('csProg').textContent = `${cur + 1}/${items.length}`;
     document.getElementById('csCountry').innerHTML = `${flag(C[idx][F.ISO])} ${C[idx][F.NAME]}`;
@@ -359,15 +400,16 @@ games.sort = () => {
       b.onclick = () => {
         const ok = b.dataset.c === C[idx][F.CONTINENT];
         if (ok) correct++;
+        // Reveal location by zooming in
+        highlightMarker(idx, ok ? currentThemeObj().visited : currentThemeObj().marker, 8);
+        map.flyTo([C[idx][F.LAT], C[idx][F.LNG]], 4, { duration: 0.4 });
         document.getElementById('feedback').innerHTML = ok ? `<span class="correct">✓</span>` : `<span class="wrong">✗ ${C[idx][F.CONTINENT]}</span>`;
         cur++;
-        setTimeout(showItem, ok ? 400 : 1000);
+        // Zoom back out and show next after delay
+        setTimeout(() => { map.setView([20, 0], 2); setTimeout(showItem, 300); }, ok ? 800 : 1500);
       };
     });
   }
-  ga.innerHTML = `<div class="note"><span id="csProg">1/${items.length}</span> · <span class="timer-big" id="csTimer">0.0s</span></div><div class="prompt">Which continent? <span id="csCountry"></span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${buckets.map(b => `<button class="btn cs-bucket" data-c="${b}">${b === 'NAmerica' ? 'N.America' : b === 'SAmerica' ? 'S.America' : b}</button>`).join('')}</div><div id="feedback" style="margin-top:8px"></div>`;
-  timer = setInterval(() => { document.getElementById('csTimer').textContent = ((Date.now() - start) / 1000).toFixed(1) + 's'; }, 100);
-  showItem();
 };
 
 startGame();

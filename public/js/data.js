@@ -248,8 +248,8 @@ export function nearestNeighbor(startIdx, dist) {
   return r;
 }
 
-export function twoOpt(route, dist, maxIter = 80) {
-  const n = CAPITALS.length, r = route.slice();
+export function twoOpt(route, dist, maxIter = 80, matrixN = 0) {
+  const n = matrixN || route.length, r = route.slice();
   let improved = true, iter = 0;
   while (improved && iter < maxIter) {
     improved = false; iter++;
@@ -275,16 +275,22 @@ export function solveGeneric(data, startIdx) {
     const v = haversine(data[i][2], data[i][3], data[j][2], data[j][3]);
     dist[i * n + j] = v; dist[j * n + i] = v;
   }
-  const vis = new Uint8Array(n), r = [startIdx];
-  vis[startIdx] = 1; let cur = startIdx;
-  for (let s = 1; s < n; s++) {
-    let b = -1, bd = Infinity;
-    for (let j = 0; j < n; j++) { if (!vis[j]) { const d = dist[cur * n + j]; if (d < bd) { bd = d; b = j; } } }
-    vis[b] = 1; r.push(b); cur = b;
+  // Nearest neighbor from start
+  function nn(si) {
+    const vis = new Uint8Array(n), r = [si];
+    vis[si] = 1; let cur = si;
+    for (let s = 1; s < n; s++) {
+      let b = -1, bd = Infinity;
+      for (let j = 0; j < n; j++) { if (!vis[j]) { const d = dist[cur * n + j]; if (d < bd) { bd = d; b = j; } } }
+      vis[b] = 1; r.push(b); cur = b;
+    }
+    return r;
   }
-  const route = twoOpt(r, dist);
-  let totalD = 0;
-  for (let i = 0; i < route.length - 1; i++) totalD += dist[route[i] * n + route[i + 1]];
+  function routeLen(r) { let t = 0; for (let i = 0; i < r.length - 1; i++) t += dist[r[i] * n + r[i + 1]]; return t; }
+  // Scale iterations with dataset size
+  const maxIter = n > 200 ? 300 : 100;
+  const route = twoOpt(nn(startIdx), dist, maxIter, n);
+  const totalD = routeLen(route);
   return { route, dist, totalD };
 }
 

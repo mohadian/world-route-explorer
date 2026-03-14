@@ -1,5 +1,5 @@
 // Shared route page logic — used by capitals, centers, and territories pages
-import { gcArc, solveGeneric, getStartCapital, setStartCapital, CAPITALS, F, flag } from './data.js';
+import { gcArc, solveGeneric, getStartCapital, setStartCapital, CAPITALS, F, flag } from './data.js?v=1773500951';
 import { applyTheme, getTheme, currentThemeObj } from './theme.js';
 import { renderInfoPopup } from './country-info.js';
 import { showOnboarding } from './onboarding.js';
